@@ -15,7 +15,7 @@ import java.util.List;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @NoArgsConstructor
 @AllArgsConstructor
-public class Vendas {
+public class Venda {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,12 +30,10 @@ public class Vendas {
 
     private String nomeVendedor;
 
-    private List<Produto> produtos;
+    private List<VendaProduto> vendaProdutos;
 
     public BigDecimal getValor(){
-        return produtos.stream()
-                .map(Produto::getValor)
-                .reduce(BigDecimal.ZERO,BigDecimal::add);
+        return vendaProdutos.stream().map(VendaProduto::getSubTotal).reduce(BigDecimal.ZERO,BigDecimal::add);
     }
 
 }

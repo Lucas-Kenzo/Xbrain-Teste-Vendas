@@ -1,4 +1,4 @@
-package vendas.model.Enum;
+package vendas.Enum;
 
 import lombok.Getter;
 
