@@ -3,9 +3,7 @@ package vendas.model;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NonNull;
+import lombok.*;
 
 import java.math.BigDecimal;
 
@@ -13,6 +11,8 @@ import java.math.BigDecimal;
 @Data
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Table(name = "venda_produto")
+@NoArgsConstructor
+@AllArgsConstructor
 public class VendaProduto {
 
     @EqualsAndHashCode.Include
@@ -23,7 +23,7 @@ public class VendaProduto {
     private Integer quantidade;
 
     public BigDecimal getSubTotal(){
-        return vendaProdutoPK.getVenda().getValor().multiply(BigDecimal.valueOf(quantidade));
+        return vendaProdutoPK.getProduto().getValor().multiply(BigDecimal.valueOf(quantidade));
     }
 
 }

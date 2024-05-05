@@ -1,5 +1,6 @@
 package vendas.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -28,15 +29,18 @@ public class Venda {
 
     private BigDecimal valor;
 
+    @Column(name = "vendedor_id")
     private Long vendedorId;
 
-    private String nomeVendedor;
+    @Column(name = "nome_vendedor")
+    private String VendedorNome;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "vendaProdutoPK.venda")
     private Set<VendaProduto> itens = new HashSet<>();
 
     public BigDecimal getValor(){
-        return itens.stream().map(VendaProduto::getSubTotal).reduce(BigDecimal.ZERO,BigDecimal::add);
+        return itens.stream().map(VendaProduto::getSubTotal).reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
 }
