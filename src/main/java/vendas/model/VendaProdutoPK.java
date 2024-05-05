@@ -2,12 +2,14 @@ package vendas.model;
 
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
-import lombok.Getter;
+import lombok.*;
 
 @Embeddable
-@Getter
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@EqualsAndHashCode
 public class VendaProdutoPK {
 
     @ManyToOne

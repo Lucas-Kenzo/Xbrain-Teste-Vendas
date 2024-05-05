@@ -8,13 +8,15 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.util.Date;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Data
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(name = "venda")
 public class Venda {
 
     @Id
@@ -30,10 +32,11 @@ public class Venda {
 
     private String nomeVendedor;
 
-    private List<VendaProduto> vendaProdutos;
+    @OneToMany(mappedBy = "vendaProdutoPK.venda")
+    private Set<VendaProduto> itens = new HashSet<>();
 
     public BigDecimal getValor(){
-        return vendaProdutos.stream().map(VendaProduto::getSubTotal).reduce(BigDecimal.ZERO,BigDecimal::add);
+        return itens.stream().map(VendaProduto::getSubTotal).reduce(BigDecimal.ZERO,BigDecimal::add);
     }
 
 }
