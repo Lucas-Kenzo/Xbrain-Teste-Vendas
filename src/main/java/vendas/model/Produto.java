@@ -1,10 +1,8 @@
 package vendas.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
+import vendas.enums.ECategoriaProduto;
 
 import java.math.BigDecimal;
 
@@ -20,15 +18,18 @@ public class Produto {
     @EqualsAndHashCode.Include
     private Long id;
 
-    @NonNull
+    @Column(name = "valor", nullable = false)
     private BigDecimal valor;
 
-    @NonNull
+    @Column(name ="descricao",nullable = false)
     private String descricao;
 
-    @NonNull
-    private String categoria;
+    @Column(name ="categoria", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private ECategoriaProduto categoria;
 
-    @NonNull
+    @Column(name ="quantidade", nullable = false)
     private Integer quantidade;
+
+
 }

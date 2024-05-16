@@ -10,7 +10,7 @@ import vendas.service.ProdutoService;
 import java.util.List;
 
 @RestController
-@RequestMapping(value = "/produtos")
+@RequestMapping("api/produtos")
 public class ProdutoController {
 
     @Autowired
@@ -22,7 +22,7 @@ public class ProdutoController {
         return ResponseEntity.ok(produtos);
     }
 
-    @GetMapping(value = "/{id}")
+    @GetMapping("{id}")
     public ResponseEntity<Produto> findById(@PathVariable Long id){
         var produto = service.findById(id);
         return ResponseEntity.ok(produto);

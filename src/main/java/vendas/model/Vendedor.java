@@ -16,13 +16,13 @@ public class Vendedor {
     @EqualsAndHashCode.Include
     private Long id;
 
-    @NonNull
+    @Column(name = "cpf", nullable = false)
     private String cpf;
 
-    @NonNull
+    @Column(name = "nome", nullable = false)
     private String nome;
 
-    @NonNull
+    @Column(name = "email", nullable = false)
     private String email;
 
 }

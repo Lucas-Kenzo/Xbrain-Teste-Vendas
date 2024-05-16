@@ -10,7 +10,7 @@ import vendas.service.VendaService;
 import java.util.List;
 
 @RestController
-@RequestMapping(value = "/vendas")
+@RequestMapping("api/vendas")
 public class VendaController {
 
     @Autowired
@@ -22,15 +22,15 @@ public class VendaController {
         return ResponseEntity.ok(vendas);
     }
 
-    @GetMapping(value = "/{id}")
+    @GetMapping("{id}")
     public ResponseEntity<Venda> findById(@PathVariable Long id){
         var venda = service.findById(id);
         return ResponseEntity.ok(venda);
     }
 
-    @PostMapping
+    @PostMapping("rascunho")
     @ResponseStatus(HttpStatus.CREATED)
     public Venda salvar(@RequestBody Venda venda){
-        return service.salvar(venda);
+        return service.criarRascunho(venda);
     }
 }

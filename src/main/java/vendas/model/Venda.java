@@ -1,23 +1,24 @@
 package vendas.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import vendas.dto.VendaProdutoDTO;
+import vendas.enums.ESituacaoVenda;
 
 import java.math.BigDecimal;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
+import java.util.stream.Collectors;
 
-@Entity
 @Data
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@Entity
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "venda")
+//@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Venda {
 
     @Id
@@ -25,22 +26,30 @@ public class Venda {
     @EqualsAndHashCode.Include
     private Long id;
 
+    @Column(name = "data_da_venda")
     private Date dataDaVenda;
 
+    @Column(name = "valor")
     private BigDecimal valor;
 
     @Column(name = "vendedor_id")
     private Long vendedorId;
 
-    @Column(name = "nome_vendedor")
+    @Column(name = "vendedor_nome")
     private String VendedorNome;
 
-    @JsonIgnore
-    @OneToMany(mappedBy = "vendaProdutoPK.venda")
-    private Set<VendaProduto> itens = new HashSet<>();
+    @Enumerated(EnumType.STRING)
+    @Column(name = "situacao", nullable = false)
+    private ESituacaoVenda situacao;
 
-    public BigDecimal getValor(){
-        return itens.stream().map(VendaProduto::getSubTotal).reduce(BigDecimal.ZERO, BigDecimal::add);
+    @OneToMany(mappedBy = "venda",fetch = FetchType.LAZY)
+    private List<VendaProduto> itens;
+
+    public List<VendaProdutoDTO> getItens(){
+        if(!itens.isEmpty()) {
+            return this.itens.stream().map(VendaProdutoDTO::new).collect(Collectors.toList());
+        }
+        return List.of();
     }
 
 }

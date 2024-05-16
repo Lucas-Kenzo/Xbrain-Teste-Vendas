@@ -1,8 +1,8 @@
 package vendas.model;
 
-import jakarta.persistence.EmbeddedId;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -15,15 +15,24 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 public class VendaProduto {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @EqualsAndHashCode.Include
-    @EmbeddedId
-    private VendaProdutoPK vendaProdutoPK;
+    private Long id;
 
-    @NonNull
+    @Column(name = "subtotal")
+    private BigDecimal subTotal;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "fk_venda", nullable = false)
+    private Venda venda;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "fk_produto", nullable = false)
+    private Produto produto;
+
+    @Column(name = "quantidade", nullable = false)
     private Integer quantidade;
 
-    public BigDecimal getSubTotal(){
-        return vendaProdutoPK.getProduto().getValor().multiply(BigDecimal.valueOf(quantidade));
-    }
 
 }
