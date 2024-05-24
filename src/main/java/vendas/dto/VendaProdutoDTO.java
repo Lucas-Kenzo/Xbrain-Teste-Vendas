@@ -9,15 +9,19 @@ import java.math.BigDecimal;
 @Getter
 public class VendaProdutoDTO {
 
-    private Long id;
+    private Long produtoId;
+    private Long vendaId;
     private String descricao;
     private Integer quantidade;
     private BigDecimal subTotal;
 
     public VendaProdutoDTO(VendaProduto vendaProduto){
-        this.id = vendaProduto.getProduto().getId();
+        this.vendaId = vendaProduto.getVenda().getId();
+        this.produtoId = vendaProduto.getProduto().getId();
         this.descricao = vendaProduto.getProduto().getDescricao();
         this.quantidade = vendaProduto.getQuantidade();
-        this.subTotal = vendaProduto.getSubTotal();
+        this.subTotal = vendaProduto.getSubTotal() != null ? vendaProduto.getSubTotal() : BigDecimal.ZERO;
+
     }
+
 }

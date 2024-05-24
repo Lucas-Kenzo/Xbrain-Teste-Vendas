@@ -4,7 +4,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import vendas.dto.VendaProdutoRequest;
+import vendas.model.Produto;
 import vendas.model.Venda;
+import vendas.model.VendaProduto;
 import vendas.service.VendaService;
 
 import java.util.List;
@@ -23,14 +26,19 @@ public class VendaController {
     }
 
     @GetMapping("{id}")
-    public ResponseEntity<Venda> findById(@PathVariable Long id){
-        var venda = service.findById(id);
-        return ResponseEntity.ok(venda);
+    public Venda findById(@PathVariable Long id){
+        return service.findById(id);
     }
 
-    @PostMapping("rascunho")
+    @PostMapping("criar-rascunho")
     @ResponseStatus(HttpStatus.CREATED)
     public Venda salvar(@RequestBody Venda venda){
         return service.criarRascunho(venda);
+    }
+
+    @PostMapping("adicionar-produtos/{id}")
+    public ResponseEntity<List<VendaProduto>> adicionarProdutos(@PathVariable Long id, @RequestBody List<VendaProdutoRequest> request){
+        var itens = service.adicionaProdutosNaVenda(id, request);
+        return ResponseEntity.ok(itens);
     }
 }

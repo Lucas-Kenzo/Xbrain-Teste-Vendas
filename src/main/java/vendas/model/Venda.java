@@ -36,20 +36,25 @@ public class Venda {
     private Long vendedorId;
 
     @Column(name = "vendedor_nome")
-    private String VendedorNome;
+    private String vendedorNome;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "situacao", nullable = false)
     private ESituacaoVenda situacao;
 
-    @OneToMany(mappedBy = "venda",fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "venda", fetch = FetchType.LAZY)
     private List<VendaProduto> itens;
+
 
     public List<VendaProdutoDTO> getItens(){
         if(!itens.isEmpty()) {
             return this.itens.stream().map(VendaProdutoDTO::new).collect(Collectors.toList());
         }
         return List.of();
+    }
+
+    public void adicionarItem(VendaProduto item){
+        this.itens.add(item);
     }
 
 }

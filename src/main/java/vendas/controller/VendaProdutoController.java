@@ -22,15 +22,11 @@ public class VendaProdutoController {
         return ResponseEntity.ok(vendaProdutos);
     }
 
-    @GetMapping("{id}")
-    public ResponseEntity<VendaProduto> findById(@PathVariable Long id){
-        var vendaProduto = service.findById(id);
+    @GetMapping("{vendaId}/produto/{produtoId}")
+    public ResponseEntity<VendaProduto> findByVendaIdAndProdutoId(@PathVariable Long vendaId,
+                                                                  @PathVariable Long produtoId) {
+        var vendaProduto = service.findByVendaIdAndProdutoId(vendaId, produtoId);
         return ResponseEntity.ok(vendaProduto);
     }
 
-    @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public VendaProduto salvar(@RequestBody VendaProduto vendaProduto){
-        return service.salvar(vendaProduto);
-    }
 }
