@@ -3,6 +3,7 @@ package vendas.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import vendas.exception.NotFoundException;
+import vendas.exception.ValidacaoException;
 import vendas.model.Vendedor;
 import vendas.repository.VendedorRepository;
 
@@ -24,6 +25,16 @@ public class VendedorService {
     }
 
     public Vendedor salvar(Vendedor vendedor){
+        vendedor.setNome(vendedor.getNome().toUpperCase());
+        verificaNome(vendedor.getNome());
         return repository.save(vendedor);
     }
+
+    public void verificaNome(String nome){
+        boolean exist = repository.findByNome(nome).isPresent();
+        if (exist){
+            throw  new ValidacaoException("O nome inserido já existe");
+        }
+    }
+
 }

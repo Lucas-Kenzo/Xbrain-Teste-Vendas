@@ -7,6 +7,7 @@ import vendas.model.VendaProduto;
 import vendas.repository.VendaProdutoRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class VendaProdutoService {
@@ -22,10 +23,8 @@ public class VendaProdutoService {
         return repository.findAll();
     }
     
-    public VendaProduto findByVendaIdAndProdutoId(Long vendaId, Long produtoId) {
-        return repository.findByVendaIdAndProdutoId(vendaId, produtoId)
-                .orElseThrow(() -> new NotFoundException("Produto de ID:" + produtoId +
-                        " não encontrado na venda de ID: " + vendaId + " !"));
+    public Optional<VendaProduto> findByVendaIdAndProdutoId(Long vendaId, Long produtoId) {
+        return repository.findByVendaIdAndProdutoId(vendaId, produtoId);
     }
 
     public void adicionar(List<VendaProduto> itens){
