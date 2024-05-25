@@ -3,19 +3,18 @@ package vendas.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import vendas.dto.VendaProdutoDTO;
 import vendas.dto.VendaProdutoRequest;
 import vendas.enums.ESituacaoVenda;
 import vendas.exception.NotFoundException;
 import vendas.exception.ValidacaoException;
+import vendas.model.Produto;
 import vendas.model.Venda;
 import vendas.model.VendaProduto;
 import vendas.repository.VendaRepository;
 
-import java.math.BigDecimal;
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class VendaService {
@@ -28,6 +27,9 @@ public class VendaService {
 
     @Autowired
     private VendaProdutoService vendaProdutoService;
+
+    @Autowired
+    private VendedorService vendedorService;
     
     public List<Venda> findAll(){
         return repository.findAll();
@@ -38,9 +40,12 @@ public class VendaService {
                 .orElseThrow(() -> new NotFoundException("Venda de ID: " + id + " não encontrada!"));
     }
     
-    public Venda criarRascunho(Venda venda) {
+    public Venda criarRascunho(Long vendedorId) {
+        var vendedor = vendedorService.findById(vendedorId);
+        var venda = new Venda();
+        venda.setVendedorId(vendedor.getId());
+        venda.setVendedorNome(vendedor.getNome());
         venda.setSituacao(ESituacaoVenda.RASCUNHO);
-        venda.setDataDaVenda(new Date());
         return repository.save(venda);
     }
 
@@ -49,37 +54,58 @@ public class VendaService {
     }
 
     @Transactional
-    public List<VendaProduto> adicionaProdutosNaVenda(Long vendaId, List<VendaProdutoRequest> requests) {
+    public Venda adicionaProdutosNaVenda(Long vendaId, List<VendaProdutoRequest> requests) {
         var venda = findById(vendaId);
         var itens = requests.stream().map(request -> salvarProdutos(venda, request)).toList();
-        venda.setValor(venda.getValor().add(calculaTotal(itens)));
         vendaProdutoService.adicionar(itens);
-        return itens;
+        venda.setValor();
+        venda.setSituacao(ESituacaoVenda.PENDENTE);
+        return venda;
     }
 
     public VendaProduto salvarProdutos(Venda venda, VendaProdutoRequest request) {
-        var produto = produtoService.findById(request.getProdutoId());
-        if(produto.getQuantidade() <= request.getQuantidade()){
-            throw new ValidacaoException("Produto de ID: " + produto.getId() +
-                    "não possui quantidade suficiente escolhida");
+        var quantidade = request.quantidade();
+        var produto = produtoService.findById(request.produtoId());
+        if(produto.getQuantidade() < quantidade){
+            throw new ValidacaoException("Produto de ID " + produto.getId() +
+                    " não possui quantidade suficiente no estoque");
         }
-        produto.setQuantidade(produto.getQuantidade() - request.getQuantidade());
+        produto.subtraiQuantidade(quantidade);
         produtoService.salvar(produto);
-        return new VendaProduto(venda, produto, request.getQuantidade());
+        return findByVendaProdutoOrNewVendaProduto(venda, produto, quantidade);
+
     }
 
     public Venda finalizarVenda(Long vendaId) {
         var venda = findById(vendaId);
-        if(!venda.getItens().isEmpty()){
-            venda.setSituacao(ESituacaoVenda.FINALIZADA);
+
+        if(venda.getSituacao().equals(ESituacaoVenda.FINALIZADA)){
+            throw new ValidacaoException("A venda de ID " + vendaId +
+                    " já está finalizada");
         }
+
+        if(venda.getItens().isEmpty()){
+            throw new ValidacaoException("A venda de ID " + vendaId +
+                    " não pode ser finalizada, pois não possui itens!");
+        }
+        venda.setSituacao(ESituacaoVenda.FINALIZADA);
+        venda.setDataDaVenda();
         return salvar(venda);
     }
 
-    public BigDecimal calculaTotal(List<VendaProduto> itens) {
-        if(!itens.isEmpty()){
-            return itens.stream().map(VendaProduto::getSubTotal).reduce(BigDecimal.ZERO, BigDecimal::add);
-        }
-        return BigDecimal.ZERO;
+    public VendaProduto findByVendaProdutoOrNewVendaProduto(Venda venda, Produto produto, Integer quantidade){
+        var vendaProdutoAtualOpt = vendaProdutoService.findByVendaIdAndProdutoId(venda.getId(), produto.getId());
+        return vendaProdutoAtualOpt.map(vendaProdutoAtual -> {
+            vendaProdutoAtual.incrementeQuantidade(quantidade);
+            vendaProdutoAtual.setSubTotal();
+            return vendaProdutoAtual;
+        }).orElseGet(() -> new VendaProduto(venda, produto, quantidade));
     }
+
+    public Integer getVendasFinalizadasPorPeriodo(Long vendedorId, LocalDate dataInicial, LocalDate dataFinal) {
+        return repository.countByVendedorIdAndSituacaoAndDataDaVendaBetween(vendedorId, ESituacaoVenda.FINALIZADA,
+                dataInicial.atStartOfDay(), dataFinal.atTime(LocalTime.MAX));
+    }
+
+
 }
