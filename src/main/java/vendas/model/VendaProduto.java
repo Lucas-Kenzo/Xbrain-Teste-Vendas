@@ -39,12 +39,16 @@ public class VendaProduto {
         this.venda = venda;
         this.produto = produto;
         this.quantidade = quantidade;
-        setSubTotal(produto, quantidade);
+        setSubTotal();
     }
 
-    private void setSubTotal(Produto produto, Integer quantidade) {
+    public void setSubTotal() {
         BigDecimal valorProduto = produto.getValor() != null ? produto.getValor() : BigDecimal.ZERO;
         this.subTotal = valorProduto.multiply(BigDecimal.valueOf(quantidade != null ? quantidade : 0));
+    }
+
+    public void incrementeQuantidade(Integer quantidade){
+        this.quantidade += quantidade;
     }
 
 }

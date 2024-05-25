@@ -31,4 +31,8 @@ public class Produto {
     @Column(name ="quantidade", nullable = false)
     private Integer quantidade;
 
+    public void subtraiQuantidade(Integer quantidade){
+        this.quantidade -= quantidade;
+    }
+
 }

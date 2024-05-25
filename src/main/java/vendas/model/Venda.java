@@ -9,8 +9,11 @@ import vendas.dto.VendaProdutoDTO;
 import vendas.enums.ESituacaoVenda;
 
 import java.math.BigDecimal;
-import java.util.Date;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Data
@@ -27,10 +30,10 @@ public class Venda {
     private Long id;
 
     @Column(name = "data_da_venda")
-    private Date dataDaVenda;
+    private LocalDateTime dataDaVenda;
 
     @Column(name = "valor")
-    private BigDecimal valor;
+    private BigDecimal valor = BigDecimal.ZERO;
 
     @Column(name = "vendedor_id")
     private Long vendedorId;
@@ -46,15 +49,24 @@ public class Venda {
     private List<VendaProduto> itens;
 
 
-    public List<VendaProdutoDTO> getItens(){
-        if(!itens.isEmpty()) {
-            return this.itens.stream().map(VendaProdutoDTO::new).collect(Collectors.toList());
-        }
-        return List.of();
+    public List<VendaProdutoDTO> getItens() {
+        return Optional.ofNullable(itens)
+                .map(itens -> itens.stream()
+                        .map(VendaProdutoDTO::new)
+                        .collect(Collectors.toList()))
+                .orElseGet(List::of);
     }
 
     public void adicionarItem(VendaProduto item){
         this.itens.add(item);
     }
 
+    public void setDataDaVenda(){
+        this.dataDaVenda = LocalDateTime.now(ZoneId.of("America/Sao_Paulo"));
+    }
+
+    public void setValor(){
+        this.valor = itens.stream().map(VendaProduto::getSubTotal)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
 }
