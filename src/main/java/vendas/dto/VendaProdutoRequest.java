@@ -7,11 +7,8 @@ import vendas.service.ProdutoService;
 
 import java.math.BigDecimal;
 
-@Getter
-@AllArgsConstructor
-public class VendaProdutoRequest {
 
-    private Long produtoId;
-    private Integer quantidade;
-
-}
+public record VendaProdutoRequest(
+        Long produtoId,
+        Integer quantidade
+){};

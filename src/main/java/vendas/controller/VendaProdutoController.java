@@ -8,6 +8,8 @@ import vendas.model.VendaProduto;
 import vendas.service.VendaProdutoService;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("api/vendaProdutos")
@@ -22,11 +24,9 @@ public class VendaProdutoController {
         return ResponseEntity.ok(vendaProdutos);
     }
 
-    @GetMapping("{vendaId}/produto/{produtoId}")
-    public ResponseEntity<VendaProduto> findByVendaIdAndProdutoId(@PathVariable Long vendaId,
-                                                                  @PathVariable Long produtoId) {
-        var vendaProduto = service.findByVendaIdAndProdutoId(vendaId, produtoId);
-        return ResponseEntity.ok(vendaProduto);
+    @GetMapping("buscar")
+    public VendaProduto findByVendaIdAndProdutoId(@RequestParam Long vendaId, @RequestParam Long produtoId){
+        return service.findByVendaIdAndProdutoId(vendaId, produtoId).get();
     }
 
 }

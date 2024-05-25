@@ -10,7 +10,7 @@ import vendas.service.VendedorService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/vendedores")
+@RequestMapping("api/vendedores")
 public class VendedorController {
 
     @Autowired

@@ -5,11 +5,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import vendas.dto.VendaProdutoRequest;
-import vendas.model.Produto;
 import vendas.model.Venda;
-import vendas.model.VendaProduto;
 import vendas.service.VendaService;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -18,6 +17,7 @@ public class VendaController {
 
     @Autowired
     private VendaService service;
+
 
     @GetMapping
     public ResponseEntity<List<Venda>> findAll(){
@@ -32,13 +32,19 @@ public class VendaController {
 
     @PostMapping("criar-rascunho")
     @ResponseStatus(HttpStatus.CREATED)
-    public Venda salvar(@RequestBody Venda venda){
-        return service.criarRascunho(venda);
+    public Venda salvar(@RequestParam Long vendedorId){
+        return service.criarRascunho(vendedorId);
     }
 
     @PostMapping("adicionar-produtos/{id}")
-    public ResponseEntity<List<VendaProduto>> adicionarProdutos(@PathVariable Long id, @RequestBody List<VendaProdutoRequest> request){
-        var itens = service.adicionaProdutosNaVenda(id, request);
-        return ResponseEntity.ok(itens);
+    public Venda adicionarProdutos(@PathVariable Long id, @RequestBody List<VendaProdutoRequest> request){
+        return service.adicionaProdutosNaVenda(id, request);
+
     }
+
+    @PutMapping("finalizar/{id}")
+    public Venda finalizar(@PathVariable Long id){
+        return service.finalizarVenda(id);
+    }
+
 }
