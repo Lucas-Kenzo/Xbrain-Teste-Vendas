@@ -1,7 +1,10 @@
 package vendas.model;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import vendas.enums.ECategoriaProduto;
 
 import java.math.BigDecimal;
@@ -33,6 +36,10 @@ public class Produto {
 
     public void subtraiQuantidade(Integer quantidade){
         this.quantidade -= quantidade;
+    }
+
+    public void incrementaQuantidade(Integer quantidade){
+        this.quantidade += quantidade;
     }
 
 }

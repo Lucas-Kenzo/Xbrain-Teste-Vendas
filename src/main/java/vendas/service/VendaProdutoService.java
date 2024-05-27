@@ -2,6 +2,7 @@ package vendas.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import vendas.exception.NotFoundException;
 import vendas.model.VendaProduto;
 import vendas.repository.VendaProdutoRepository;
@@ -25,6 +26,17 @@ public class VendaProdutoService {
     
     public Optional<VendaProduto> findByVendaIdAndProdutoId(Long vendaId, Long produtoId) {
         return repository.findByVendaIdAndProdutoId(vendaId, produtoId);
+    }
+
+    public VendaProduto findVendaProdutoOrThrow(Long vendaId, Long produtoId){
+        return repository.findByVendaIdAndProdutoId(vendaId, produtoId)
+                .orElseThrow(() -> new NotFoundException("Produto de ID " + produtoId + " não encontrado na venda " +
+                        "de ID " + vendaId));
+    }
+
+    @Transactional
+    public void excluir(VendaProduto vendaProduto){
+        repository.delete(vendaProduto);
     }
 
     public void adicionar(List<VendaProduto> itens){

@@ -5,7 +5,6 @@ import org.springframework.stereotype.Repository;
 import vendas.enums.ESituacaoVenda;
 import vendas.model.Venda;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Repository

@@ -8,7 +8,6 @@ import vendas.dto.VendaProdutoRequest;
 import vendas.model.Venda;
 import vendas.service.VendaService;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -46,5 +45,4 @@ public class VendaController {
     public Venda finalizar(@PathVariable Long id){
         return service.finalizarVenda(id);
     }
-
 }

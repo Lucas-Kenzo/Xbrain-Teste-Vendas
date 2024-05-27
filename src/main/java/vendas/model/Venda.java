@@ -12,7 +12,6 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -57,8 +56,11 @@ public class Venda {
                 .orElseGet(List::of);
     }
 
-    public void adicionarItem(VendaProduto item){
-        this.itens.add(item);
+    public void substituiItens(List<VendaProduto> itens){
+        if(!this.itens.isEmpty()){
+            this.itens.clear();
+        }
+        this.itens.addAll(itens);
     }
 
     public void setDataDaVenda(){

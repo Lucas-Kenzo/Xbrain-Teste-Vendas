@@ -1,12 +1,12 @@
 package vendas.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
-import java.util.Optional;
 
 @Entity
 @Data
@@ -47,8 +47,6 @@ public class VendaProduto {
         this.subTotal = valorProduto.multiply(BigDecimal.valueOf(quantidade != null ? quantidade : 0));
     }
 
-    public void incrementeQuantidade(Integer quantidade){
-        this.quantidade += quantidade;
-    }
+
 
 }
