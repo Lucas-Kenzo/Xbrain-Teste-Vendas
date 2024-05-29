@@ -33,4 +33,17 @@ public class ProdutoController {
     public Produto salvar(@RequestBody Produto produto){
         return service.salvar(produto);
     }
+
+
+    @PutMapping("{id}")
+    public Produto editar(@PathVariable Long id, @RequestBody Produto produto){
+        return service.editar(id, produto);
+    }
+
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @DeleteMapping("{id}")
+    public void excluir(@PathVariable Long id){
+        service.excluir(id);
+    }
+
 }

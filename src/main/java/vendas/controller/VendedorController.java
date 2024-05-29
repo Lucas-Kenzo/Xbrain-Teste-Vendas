@@ -33,4 +33,15 @@ public class VendedorController {
     public Vendedor salvar(@RequestBody Vendedor vendedor){
         return service.salvar(vendedor);
     }
+
+    @PutMapping("{id}")
+    public Vendedor editar(@PathVariable Long id, @RequestBody Vendedor vendedor) {
+        return service.editar(id, vendedor);
+    }
+
+    @DeleteMapping("{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void excluir(@PathVariable Long id) {
+        service.excluir(id);
+    }
 }

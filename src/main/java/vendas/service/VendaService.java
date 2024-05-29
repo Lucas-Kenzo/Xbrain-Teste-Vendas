@@ -1,10 +1,13 @@
 package vendas.service;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import vendas.dto.VendaProdutoRequest;
 import vendas.enums.ESituacaoVenda;
+import vendas.exception.EntidadeEmUsoException;
 import vendas.exception.NotFoundException;
 import vendas.exception.ValidacaoException;
 import vendas.model.Produto;
@@ -128,15 +131,13 @@ public class VendaService {
         return salvar(venda);
     }
 
-
-
     public Integer getVendasFinalizadasPorPeriodo(Long vendedorId, LocalDate dataInicial, LocalDate dataFinal) {
         return repository.countByVendedorIdAndSituacaoAndDataDaVendaBetween(vendedorId, ESituacaoVenda.FINALIZADA,
                 dataInicial.atStartOfDay(), dataFinal.atTime(LocalTime.MAX));
     }
 
     @Transactional
-    public void removerProdutos(Long vendaId, List<VendaProdutoRequest> requests){
+    public void removerProdutos(Long vendaId, List<VendaProdutoRequest> requests) {
         var vendaProdutos = requests.stream().map( request -> {
             var vendaProduto = vendaProdutoService.findVendaProdutoOrThrow(vendaId, request.produtoId());
             var produto = produtoService.findById(request.produtoId());
@@ -144,6 +145,27 @@ public class VendaService {
             produtoService.salvar(produto);
             return vendaProduto;
         }).toList();
+    }
+
+    @Transactional
+    public Venda alterarVendedor(Long vendaId, Long VendedorId) {
+        var venda = findById(vendaId);
+        var vendedor = vendedorService.findById(vendaId);
+        venda.setVendedorId(vendedor.getId());
+        venda.setVendedorNome(vendedor.getNome());
+        return salvar(venda);
+    }
+
+    @Transactional
+    public void excluir(Long vendaId){
+        var venda = findById(vendaId);
+        vendaProdutoService.excluirRegistrosDaVenda(vendaId);
+        try {
+            repository.delete(venda);
+        }catch (DataIntegrityViolationException e) {
+            throw new EntidadeEmUsoException("Não foi possível excluir a venda de ID " + vendaId);
+        }
+
     }
 
 }

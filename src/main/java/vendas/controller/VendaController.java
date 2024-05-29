@@ -36,7 +36,7 @@ public class VendaController {
     }
 
     @PostMapping("adicionar-produtos/{id}")
-    public Venda adicionarProdutos(@PathVariable Long id, @RequestBody List<VendaProdutoRequest> request){
+    public Venda adicionarProdutos(@PathVariable Long id, @RequestBody List<VendaProdutoRequest> request) {
         return service.adicionaProdutosNaVenda(id, request);
 
     }
@@ -44,5 +44,16 @@ public class VendaController {
     @PutMapping("finalizar/{id}")
     public Venda finalizar(@PathVariable Long id){
         return service.finalizarVenda(id);
+    }
+
+    @PutMapping("altera-vendedor/{id}")
+    public Venda alterarVendedor(@PathVariable Long id, @RequestParam Long vendedorId) {
+        return service.alterarVendedor(id, vendedorId);
+    }
+
+    @DeleteMapping("{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void excluir(@PathVariable Long id) {
+        service.excluir(id);
     }
 }

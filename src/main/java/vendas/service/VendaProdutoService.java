@@ -34,10 +34,11 @@ public class VendaProdutoService {
                         "de ID " + vendaId));
     }
 
-    @Transactional
-    public void excluir(VendaProduto vendaProduto){
-        repository.delete(vendaProduto);
+    public void excluirRegistrosDaVenda(Long vendaId){
+        var vendaProdutos = repository.findByVendaId(vendaId);
+        repository.deleteAll(vendaProdutos);
     }
+
 
     public void adicionar(List<VendaProduto> itens){
         repository.saveAll(itens);
