@@ -1,7 +1,6 @@
 package vendas.service;
 
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,19 +19,16 @@ import java.time.LocalTime;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class VendaService {
     
-    @Autowired
-    private VendaRepository repository;
+    private final VendaRepository repository;
 
-    @Autowired
-    private ProdutoService produtoService;
+    private final ProdutoService produtoService;
 
-    @Autowired
-    private VendaProdutoService vendaProdutoService;
+    private final VendaProdutoService vendaProdutoService;
 
-    @Autowired
-    private VendedorService vendedorService;
+    private final VendedorService vendedorService;
     
     public List<Venda> findAll(){
         return repository.findAll();
@@ -62,31 +58,33 @@ public class VendaService {
         if(venda.getSituacao().equals(ESituacaoVenda.FINALIZADA)){
             throw new ValidacaoException("Não é possível alterar os produtos de uma venda já finalizada");
         }
-        var itens = requests.stream().map(request -> salvarProdutos(venda, request)).toList();
+        var itens = salvarProdutos(venda, requests);
         comparaItens(venda, itens);
-        venda.substituiItens(itens);
+        venda.setItens(itens);
         vendaProdutoService.adicionar(itens);
         venda.setValor();
         venda.setSituacao(ESituacaoVenda.PENDENTE);
-        return venda;
+        return salvar(venda);
     }
 
-    public VendaProduto salvarProdutos(Venda venda, VendaProdutoRequest request) {
-        var quantidade = request.quantidade();
-        var produto = produtoService.findById(request.produtoId());
-        return findByVendaProdutoOrNewVendaProduto(venda, produto, quantidade);
+    public List<VendaProduto> salvarProdutos(Venda venda, List<VendaProdutoRequest> requests) {
+        return requests.stream().map(request -> {
+            var quantidade = request.quantidade();
+            var produto = produtoService.findById(request.produtoId());
+            return findByVendaProdutoOrNewVendaProduto(venda, produto, quantidade);
+        }).toList();
     }
 
     public VendaProduto findByVendaProdutoOrNewVendaProduto(Venda venda, Produto produto, Integer quantidade){
         var vendaProdutoAtualOpt = vendaProdutoService.findByVendaIdAndProdutoId(venda.getId(), produto.getId());
         return vendaProdutoAtualOpt.map(vendaProdutoAtual -> {
+            if(produto.getQuantidade() < (quantidade - vendaProdutoAtual.getQuantidade())) {
+                throw new ValidacaoException("Produto de ID " + produto.getId() +
+                        " não possui quantidade suficiente no estoque");
+            }
             if (vendaProdutoAtual.getQuantidade() > quantidade) {
                 produto.incrementaQuantidade(vendaProdutoAtual.getQuantidade() - quantidade);
             } else {
-                if(produto.getQuantidade() < (quantidade - vendaProdutoAtual.getQuantidade())){
-                    throw new ValidacaoException("Produto de ID " + produto.getId() +
-                            " não possui quantidade suficiente no estoque");
-                }
                 produto.subtraiQuantidade(quantidade - vendaProdutoAtual.getQuantidade());
             }
             produtoService.salvar(produto);
@@ -110,6 +108,7 @@ public class VendaService {
                 var produto = produtoService.findById(itemAtual.getProdutoId());
                 produto.incrementaQuantidade(itemAtual.getQuantidade());
                 produtoService.salvar(produto);
+                vendaProdutoService.excluir(itemAtual.getId());
             }
         });
     }
@@ -121,7 +120,6 @@ public class VendaService {
             throw new ValidacaoException("A venda de ID " + vendaId +
                     " já está finalizada");
         }
-
         if(venda.getItens().isEmpty()){
             throw new ValidacaoException("A venda de ID " + vendaId +
                     " não pode ser finalizada, pois não possui itens!");
@@ -149,7 +147,12 @@ public class VendaService {
 
     @Transactional
     public Venda alterarVendedor(Long vendaId, Long VendedorId) {
+
         var venda = findById(vendaId);
+
+        if (venda.getSituacao().equals(ESituacaoVenda.FINALIZADA)){
+            throw new ValidacaoException("Não é possível trocar o vendedor de uma venda finalizada");
+        }
         var vendedor = vendedorService.findById(vendaId);
         venda.setVendedorId(vendedor.getId());
         venda.setVendedorNome(vendedor.getNome());
@@ -165,7 +168,6 @@ public class VendaService {
         }catch (DataIntegrityViolationException e) {
             throw new EntidadeEmUsoException("Não foi possível excluir a venda de ID " + vendaId);
         }
-
     }
 
 }

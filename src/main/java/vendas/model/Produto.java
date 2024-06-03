@@ -1,10 +1,7 @@
 package vendas.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import vendas.enums.ECategoriaProduto;
 
 import java.math.BigDecimal;
@@ -14,6 +11,7 @@ import java.math.BigDecimal;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class Produto {
 
     @Id
@@ -22,7 +20,7 @@ public class Produto {
     private Long id;
 
     @Column(name = "valor", nullable = false)
-    private BigDecimal valor;
+    private BigDecimal valor = BigDecimal.ZERO;
 
     @Column(name ="descricao",nullable = false)
     private String descricao;

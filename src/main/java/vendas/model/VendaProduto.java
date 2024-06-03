@@ -1,10 +1,7 @@
 package vendas.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.math.BigDecimal;
 
@@ -14,11 +11,12 @@ import java.math.BigDecimal;
 @Table(name = "venda_produto")
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class VendaProduto {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @EqualsAndHashCode.Include
+
     private Long id;
 
     @Column(name = "subtotal")

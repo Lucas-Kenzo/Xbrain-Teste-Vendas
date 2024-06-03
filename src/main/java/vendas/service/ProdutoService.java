@@ -1,5 +1,6 @@
 package vendas.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -13,10 +14,10 @@ import vendas.repository.ProdutoRepository;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class ProdutoService {
     
-    @Autowired
-    private ProdutoRepository repository;
+    private final ProdutoRepository repository;
     
     public List<Produto> findAll(){
         return repository.findAll();

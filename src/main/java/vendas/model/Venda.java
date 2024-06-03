@@ -1,16 +1,14 @@
 package vendas.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import vendas.dto.VendaProdutoDTO;
+import lombok.*;
+import vendas.dto.VendaProdutoResponse;
 import vendas.enums.ESituacaoVenda;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -19,6 +17,7 @@ import java.util.stream.Collectors;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 @Table(name = "venda")
 //@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Venda {
@@ -48,27 +47,32 @@ public class Venda {
     private List<VendaProduto> itens;
 
 
-    public List<VendaProdutoDTO> getItens() {
+    public List<VendaProdutoResponse> getItens() {
         return Optional.ofNullable(itens)
                 .map(itens -> itens.stream()
-                        .map(VendaProdutoDTO::new)
+                        .map(VendaProdutoResponse::new)
                         .collect(Collectors.toList()))
                 .orElseGet(List::of);
     }
 
-    public void substituiItens(List<VendaProduto> itens){
+    public void substituiItens(List<VendaProduto> itens) {
         if(!this.itens.isEmpty()){
             this.itens.clear();
         }
-        this.itens.addAll(itens);
+        setItens(itens);
     }
 
     public void setDataDaVenda(){
         this.dataDaVenda = LocalDateTime.now(ZoneId.of("America/Sao_Paulo"));
     }
 
-    public void setValor(){
+    public void setValor() {
         this.valor = itens.stream().map(VendaProduto::getSubTotal)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
+
+    public void setItens(List<VendaProduto> itens){
+        this.itens = new ArrayList<>(itens);
+    }
+
 }
