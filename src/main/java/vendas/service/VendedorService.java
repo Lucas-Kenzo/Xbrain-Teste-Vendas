@@ -30,27 +30,30 @@ public class VendedorService {
 
     public Vendedor salvar(Vendedor vendedor){
         vendedor.setNome(vendedor.getNome().toUpperCase());
-        verificaNome(vendedor.getNome());
-        verificaCpf(vendedor.getCpf());
+        verificaNome(vendedor.getNome(), vendedor.getId());
+        verificaCpf(vendedor.getCpf(), vendedor.getId());
         return repository.save(vendedor);
     }
 
-    public void verificaNome(String nome){
-        boolean exist = repository.findByNome(nome).isPresent();
-        if (exist){
+    public void verificaNome(String nome, Long vendedorId){
+        var vendedor = repository.findByNome(nome);
+        if (vendedor.isPresent() && !vendedor.get().getId().equals(vendedorId)){
             throw  new ValidacaoException("O nome inserido já está cadastrado");
         }
     }
-    public void verificaCpf(String cpf){
-        boolean exist = repository.findByCpf(cpf).isPresent();
-        if (exist){
+    public void verificaCpf(String cpf, Long vendedorId){
+        var vendedor = repository.findByCpf(cpf);
+        if (vendedor.isPresent() && !vendedor.get().getId().equals(vendedorId)){
             throw  new ValidacaoException("O cpf inserido já está cadastrado");
         }
     }
 
     public Vendedor editar(Long vendedorId, Vendedor vendedor){
+        vendedor.setNome(vendedor.getNome().toUpperCase());
         var vendedorAtual = findById(vendedorId);
         BeanUtils.copyProperties(vendedor, vendedorAtual, "id");
+        verificaNome(vendedorAtual.getNome(), vendedorAtual.getId());
+        verificaCpf(vendedorAtual.getCpf(), vendedorAtual.getId());
         return salvar(vendedorAtual);
     }
 

@@ -66,7 +66,7 @@ public class Venda {
         this.dataDaVenda = LocalDateTime.now(ZoneId.of("America/Sao_Paulo"));
     }
 
-    public void setValor() {
+    public void calcularValorTotal() {
         this.valor = itens.stream().map(VendaProduto::getSubTotal)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }

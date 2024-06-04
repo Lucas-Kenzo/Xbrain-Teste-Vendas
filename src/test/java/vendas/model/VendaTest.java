@@ -1,10 +1,13 @@
 package vendas.model;
 
+import org.assertj.core.api.Assertions;
+import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.Test;
 import vendas.dto.VendaProdutoResponse;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static vendas.utils.TestData.*;
 
 class VendaTest {
@@ -17,11 +20,34 @@ class VendaTest {
 
         var itensEsperados = outraListaVendaProduto().stream().map(VendaProdutoResponse::new).toList();
 
-        assertTrue(verificaSeTodosItensIguais(itensEsperados, venda.getItens()));
+        assertThat(venda.getItens())
+                .extracting(VendaProdutoResponse::getId, VendaProdutoResponse::getVendaId,
+                        VendaProdutoResponse::getProdutoId)
+                .containsExactlyInAnyOrder(
+                        Tuple.tuple(1L, 1L, 4L),
+                        Tuple.tuple(2L, 1L, 5L),
+                        Tuple.tuple(3L, 1L, 6L)
+                );
     }
 
-    private boolean verificaSeTodosItensIguais(List<VendaProdutoResponse> e, List<VendaProdutoResponse> a) {
-       return e.stream().allMatch(itemEsperado ->
-               a.stream().anyMatch(itemAtual -> itemAtual.getId().equals(itemEsperado.getId())));
+    @Test
+    void getItens_deveRetornarListaVazia_quandoVendaSemItem() {
+        assertThat(umaVendaPendente().getItens()).isEmpty();
     }
+
+    @Test
+    void getItens_deveRetornarItemResponse_quandoPossuirItem() {
+        var venda = umaVendaPendente();
+        venda.setItens(outraListaVendaProduto());
+
+        assertThat(venda.getItens())
+                .extracting(VendaProdutoResponse::getId, VendaProdutoResponse::getVendaId,
+                        VendaProdutoResponse::getProdutoId)
+                .containsExactlyInAnyOrder(
+                        Tuple.tuple(1L, 1L, 4L),
+                        Tuple.tuple(2L, 1L, 5L),
+                        Tuple.tuple(3L, 1L, 6L)
+                );
+    }
+
 }

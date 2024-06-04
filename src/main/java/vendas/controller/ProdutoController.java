@@ -1,5 +1,6 @@
 package vendas.controller;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,11 +11,12 @@ import vendas.service.ProdutoService;
 import java.util.List;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("api/produtos")
 public class ProdutoController {
 
     @Autowired
-    private ProdutoService service;
+    private final ProdutoService service;
 
     @GetMapping
     public ResponseEntity<List<Produto>> findAll(){

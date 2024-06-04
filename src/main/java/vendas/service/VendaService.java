@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
 import vendas.dto.VendaProdutoRequest;
 import vendas.enums.ESituacaoVenda;
 import vendas.exception.EntidadeEmUsoException;
@@ -17,6 +18,7 @@ import vendas.repository.VendaRepository;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -62,7 +64,7 @@ public class VendaService {
         comparaItens(venda, itens);
         venda.setItens(itens);
         vendaProdutoService.adicionar(itens);
-        venda.setValor();
+        venda.calcularValorTotal();
         venda.setSituacao(ESituacaoVenda.PENDENTE);
         return salvar(venda);
     }
@@ -116,11 +118,11 @@ public class VendaService {
     public Venda finalizarVenda(Long vendaId) {
         var venda = findById(vendaId);
 
-        if(venda.getSituacao().equals(ESituacaoVenda.FINALIZADA)){
+        if(venda.getSituacao() == ESituacaoVenda.FINALIZADA){
             throw new ValidacaoException("A venda de ID " + vendaId +
                     " já está finalizada");
         }
-        if(venda.getItens().isEmpty()){
+        if(ObjectUtils.isEmpty(venda.getItens())){
             throw new ValidacaoException("A venda de ID " + vendaId +
                     " não pode ser finalizada, pois não possui itens!");
         }

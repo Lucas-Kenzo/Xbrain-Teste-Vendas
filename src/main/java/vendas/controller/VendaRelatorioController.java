@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import vendas.dto.VendaRelatorioDTO;
+import vendas.dto.VendaRelatorioResponse;
 import vendas.service.VendaRelatorioService;
 
 import java.time.LocalDate;
@@ -19,8 +19,8 @@ public class VendaRelatorioController {
     VendaRelatorioService service;
 
     @GetMapping
-    public List<VendaRelatorioDTO> gerarRelatorioVendas(@RequestParam LocalDate dataInicial,
-                                                        @RequestParam LocalDate dataFinal) {
+    public List<VendaRelatorioResponse> gerarRelatorioVendas(@RequestParam LocalDate dataInicial,
+                                                             @RequestParam LocalDate dataFinal) {
         return service.findAll(dataInicial, dataFinal);
     }
 }

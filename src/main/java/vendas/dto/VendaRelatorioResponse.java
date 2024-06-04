@@ -12,13 +12,13 @@ import java.time.temporal.ChronoUnit;
 @Getter
 @NoArgsConstructor
 @Setter
-public class VendaRelatorioDTO {
+public class VendaRelatorioResponse {
 
     private String vendedorNome;
     private Integer totalVendas;
     private BigDecimal mediaDiaria;
 
-    public VendaRelatorioDTO(String vendedorNome, Integer totalVendas){
+    public VendaRelatorioResponse(String vendedorNome, Integer totalVendas){
         this.vendedorNome = vendedorNome;
         this.totalVendas = totalVendas;
     }

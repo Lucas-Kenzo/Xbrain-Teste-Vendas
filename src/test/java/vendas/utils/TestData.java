@@ -1,5 +1,7 @@
 package vendas.utils;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import vendas.dto.VendaProdutoRequest;
 import vendas.enums.ECategoriaProduto;
 import vendas.enums.ESituacaoVenda;
@@ -8,12 +10,20 @@ import vendas.model.Venda;
 import vendas.model.VendaProduto;
 import vendas.model.Vendedor;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 public class TestData {
+
+    public static byte[] convertObjectToJsonBytes(Object object) throws IOException {
+        var mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
+
+        return mapper.writeValueAsBytes(object);
+    }
 
     public static Venda umaVendaPendente() {
         return Venda.builder()
@@ -22,7 +32,6 @@ public class TestData {
                 .vendedorId(1L)
                 .vendedorNome("VENDEDOR 01")
                 .situacao(ESituacaoVenda.PENDENTE)
-                .itens(List.of())
                 .build();
     }
     public static Venda umaVendaRascunho() {
@@ -32,7 +41,6 @@ public class TestData {
                 .vendedorId(1L)
                 .vendedorNome("VENDEDOR 01")
                 .situacao(ESituacaoVenda.RASCUNHO)
-                .itens(List.of())
                 .build();
     }
 
@@ -44,7 +52,7 @@ public class TestData {
                 .situacao(ESituacaoVenda.FINALIZADA)
                 .itens(umalistaVendaProduto())
                 .build();
-        venda.setValor();
+        venda.calcularValorTotal();
         venda.setDataDaVenda();
         return venda;
     }
@@ -105,7 +113,7 @@ public class TestData {
     public static Vendedor umVendedor() {
         return Vendedor.builder()
                 .id(1L)
-                .nome("VENDEDOR 01")
+                .nome("Vendedor 01")
                 .cpf("123.123.123-10")
                 .email("vendedor01@gmail.com")
                 .build();

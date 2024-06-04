@@ -1,9 +1,9 @@
 package vendas.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import vendas.dto.VendaRelatorioDTO;
+import vendas.dto.VendaRelatorioResponse;
+import vendas.exception.ValidacaoException;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -17,11 +17,16 @@ public class VendaRelatorioService {
 
     private final VendaService vendaService;
 
-    public List<VendaRelatorioDTO> findAll(LocalDate dataInicial, LocalDate dataFinal){
+    public List<VendaRelatorioResponse> findAll(LocalDate dataInicial, LocalDate dataFinal){
+
+        if(dataFinal.isBefore(dataInicial)) {
+            throw new ValidacaoException("DataFinal não pode ser menor que dataInicial");
+        }
+
         return vendedorService.findAll().stream()
                 .map(vendedor -> {
                     var total = vendaService.getVendasFinalizadasPorPeriodo(vendedor.getId(), dataInicial, dataFinal);
-                    var relatorio = new VendaRelatorioDTO(vendedor.getNome(), total);
+                    var relatorio = new VendaRelatorioResponse(vendedor.getNome(), total);
                     relatorio.setMediaDiaria(dataInicial, dataFinal);
                     return relatorio;
                 })
