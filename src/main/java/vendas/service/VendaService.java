@@ -148,14 +148,14 @@ public class VendaService {
     }
 
     @Transactional
-    public Venda alterarVendedor(Long vendaId, Long VendedorId) {
+    public Venda alterarVendedor(Long vendaId, Long vendedorId) {
 
         var venda = findById(vendaId);
 
         if (venda.getSituacao().equals(ESituacaoVenda.FINALIZADA)){
             throw new ValidacaoException("Não é possível trocar o vendedor de uma venda finalizada");
         }
-        var vendedor = vendedorService.findById(vendaId);
+        var vendedor = vendedorService.findById(vendedorId);
         venda.setVendedorId(vendedor.getId());
         venda.setVendedorNome(vendedor.getNome());
         return salvar(venda);
