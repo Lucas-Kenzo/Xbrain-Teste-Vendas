@@ -18,12 +18,11 @@ import vendas.repository.VendaRepository;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
-import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
 public class VendaService {
-    
+
     private final VendaRepository repository;
 
     private final ProdutoService produtoService;
@@ -31,16 +30,16 @@ public class VendaService {
     private final VendaProdutoService vendaProdutoService;
 
     private final VendedorService vendedorService;
-    
-    public List<Venda> findAll(){
+
+    public List<Venda> findAll() {
         return repository.findAll();
     }
-    
+
     public Venda findById(Long id) {
         return repository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Venda de ID: " + id + " não encontrada!"));
     }
-    
+
     public Venda criarRascunho(Long vendedorId) {
         var vendedor = vendedorService.findById(vendedorId);
         var venda = new Venda();
@@ -50,14 +49,14 @@ public class VendaService {
         return salvar(venda);
     }
 
-    public Venda salvar(Venda venda){
+    public Venda salvar(Venda venda) {
         return repository.save(venda);
     }
 
     @Transactional
     public Venda adicionaProdutosNaVenda(Long vendaId, List<VendaProdutoRequest> requests) {
         var venda = findById(vendaId);
-        if(venda.getSituacao().equals(ESituacaoVenda.FINALIZADA)){
+        if (venda.getSituacao().equals(ESituacaoVenda.FINALIZADA)) {
             throw new ValidacaoException("Não é possível alterar os produtos de uma venda já finalizada");
         }
         var itens = salvarProdutos(venda, requests);
@@ -77,10 +76,10 @@ public class VendaService {
         }).toList();
     }
 
-    public VendaProduto findByVendaProdutoOrNewVendaProduto(Venda venda, Produto produto, Integer quantidade){
+    public VendaProduto findByVendaProdutoOrNewVendaProduto(Venda venda, Produto produto, Integer quantidade) {
         var vendaProdutoAtualOpt = vendaProdutoService.findByVendaIdAndProdutoId(venda.getId(), produto.getId());
         return vendaProdutoAtualOpt.map(vendaProdutoAtual -> {
-            if(produto.getQuantidade() < (quantidade - vendaProdutoAtual.getQuantidade())) {
+            if (produto.getQuantidade() < (quantidade - vendaProdutoAtual.getQuantidade())) {
                 throw new ValidacaoException("Produto de ID " + produto.getId() +
                         " não possui quantidade suficiente no estoque");
             }
@@ -94,7 +93,7 @@ public class VendaService {
             vendaProdutoAtual.setSubTotal();
             return vendaProdutoAtual;
         }).orElseGet(() -> {
-            if(produto.getQuantidade() < quantidade){
+            if (produto.getQuantidade() < quantidade) {
                 throw new ValidacaoException("Produto de ID " + produto.getId() +
                         " não possui quantidade suficiente no estoque");
             }
@@ -104,7 +103,7 @@ public class VendaService {
         });
     }
 
-    public void comparaItens(Venda venda, List<VendaProduto> itens){
+    public void comparaItens(Venda venda, List<VendaProduto> itens) {
         venda.getItens().forEach(itemAtual -> {
             if (itens.stream().noneMatch(item -> item.getProduto().getId().equals(itemAtual.getProdutoId()))) {
                 var produto = produtoService.findById(itemAtual.getProdutoId());
@@ -117,18 +116,25 @@ public class VendaService {
 
     public Venda finalizarVenda(Long vendaId) {
         var venda = findById(vendaId);
-
-        if(venda.getSituacao() == ESituacaoVenda.FINALIZADA){
-            throw new ValidacaoException("A venda de ID " + vendaId +
-                    " já está finalizada");
-        }
-        if(ObjectUtils.isEmpty(venda.getItens())){
-            throw new ValidacaoException("A venda de ID " + vendaId +
-                    " não pode ser finalizada, pois não possui itens!");
-        }
+        seVendaFinalizada(vendaId, venda);
+        seVendaPossuiItens(vendaId, venda);
         venda.setSituacao(ESituacaoVenda.FINALIZADA);
         venda.setDataDaVenda();
         return salvar(venda);
+    }
+
+    private static void seVendaPossuiItens(Long vendaId, Venda venda) {
+        if (ObjectUtils.isEmpty(venda.getItens())) {
+            throw new ValidacaoException("A venda de ID " + vendaId +
+                    " não pode ser finalizada, pois não possui itens!");
+        }
+    }
+
+    private static void seVendaFinalizada(Long vendaId, Venda venda) {
+        if (venda.getSituacao() == ESituacaoVenda.FINALIZADA) {
+            throw new ValidacaoException("A venda de ID " + vendaId +
+                    " já está finalizada");
+        }
     }
 
     public Integer getVendasFinalizadasPorPeriodo(Long vendedorId, LocalDate dataInicial, LocalDate dataFinal) {
@@ -137,22 +143,11 @@ public class VendaService {
     }
 
     @Transactional
-    public void removerProdutos(Long vendaId, List<VendaProdutoRequest> requests) {
-        var vendaProdutos = requests.stream().map( request -> {
-            var vendaProduto = vendaProdutoService.findVendaProdutoOrThrow(vendaId, request.produtoId());
-            var produto = produtoService.findById(request.produtoId());
-            produto.incrementaQuantidade(vendaProduto.getQuantidade());
-            produtoService.salvar(produto);
-            return vendaProduto;
-        }).toList();
-    }
-
-    @Transactional
     public Venda alterarVendedor(Long vendaId, Long vendedorId) {
 
         var venda = findById(vendaId);
 
-        if (venda.getSituacao().equals(ESituacaoVenda.FINALIZADA)){
+        if (venda.getSituacao().equals(ESituacaoVenda.FINALIZADA)) {
             throw new ValidacaoException("Não é possível trocar o vendedor de uma venda finalizada");
         }
         var vendedor = vendedorService.findById(vendedorId);
@@ -162,14 +157,13 @@ public class VendaService {
     }
 
     @Transactional
-    public void excluir(Long vendaId){
+    public void excluir(Long vendaId) {
         var venda = findById(vendaId);
         vendaProdutoService.excluirRegistrosDaVenda(vendaId);
         try {
             repository.delete(venda);
-        }catch (DataIntegrityViolationException e) {
+        } catch (DataIntegrityViolationException e) {
             throw new EntidadeEmUsoException("Não foi possível excluir a venda de ID " + vendaId);
         }
     }
-
 }

@@ -33,7 +33,7 @@ public class VendaProduto {
     @Column(name = "quantidade", nullable = false)
     private Integer quantidade;
 
-    public VendaProduto(Venda venda, Produto produto, Integer quantidade){
+    public VendaProduto(Venda venda, Produto produto, Integer quantidade) {
         this.venda = venda;
         this.produto = produto;
         this.quantidade = quantidade;
@@ -44,7 +44,6 @@ public class VendaProduto {
         BigDecimal valorProduto = produto.getValor() != null ? produto.getValor() : BigDecimal.ZERO;
         this.subTotal = valorProduto.multiply(BigDecimal.valueOf(quantidade != null ? quantidade : 0));
     }
-
 
 
 }

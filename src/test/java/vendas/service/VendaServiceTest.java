@@ -60,11 +60,11 @@ class VendaServiceTest {
     void findById_deveRetornarVenda_quandoSolicitado() {
         when(repository.findById(any(Long.class))).thenReturn(Optional.of(umaVendaFinalizada()));
 
-        var venda = service.findById(1L);
-
         assertThat(service.findById(1L))
                 .extracting(Venda::getId, Venda::getValor, Venda::getSituacao)
                 .containsExactlyInAnyOrder(1L, BigDecimal.valueOf(876), ESituacaoVenda.FINALIZADA);
+
+        verify(repository).findById(any(Long.class));
     }
 
     @Test

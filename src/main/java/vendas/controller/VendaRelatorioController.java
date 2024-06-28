@@ -1,6 +1,6 @@
 package vendas.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -12,11 +12,11 @@ import java.time.LocalDate;
 import java.util.List;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("api/relatorios")
 public class VendaRelatorioController {
 
-    @Autowired
-    VendaRelatorioService service;
+    public final VendaRelatorioService service;
 
     @GetMapping
     public List<VendaRelatorioResponse> gerarRelatorioVendas(@RequestParam LocalDate dataInicial,

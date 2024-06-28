@@ -17,9 +17,9 @@ public class VendaRelatorioService {
 
     private final VendaService vendaService;
 
-    public List<VendaRelatorioResponse> findAll(LocalDate dataInicial, LocalDate dataFinal){
+    public List<VendaRelatorioResponse> findAll(LocalDate dataInicial, LocalDate dataFinal) {
 
-        if(dataFinal.isBefore(dataInicial)) {
+        if (dataFinal.isBefore(dataInicial)) {
             throw new ValidacaoException("DataFinal não pode ser menor que dataInicial");
         }
 

@@ -1,7 +1,6 @@
 package vendas.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,19 +18,18 @@ public class VendaController {
     private final VendaService service;
 
     @GetMapping
-    public ResponseEntity<List<Venda>> findAll(){
-        var vendas = service.findAll();
-        return ResponseEntity.ok(vendas);
+    public List<Venda> findAll() {
+        return service.findAll();
     }
 
     @GetMapping("{id}")
-    public Venda findById(@PathVariable Long id){
+    public Venda findById(@PathVariable Long id) {
         return service.findById(id);
     }
 
     @PostMapping("criar-rascunho")
     @ResponseStatus(HttpStatus.CREATED)
-    public Venda salvar(@RequestParam Long vendedorId){
+    public Venda salvar(@RequestParam Long vendedorId) {
         return service.criarRascunho(vendedorId);
     }
 
@@ -41,7 +39,7 @@ public class VendaController {
     }
 
     @PutMapping("finalizar/{id}")
-    public Venda finalizar(@PathVariable Long id){
+    public Venda finalizar(@PathVariable Long id) {
         return service.finalizarVenda(id);
     }
 

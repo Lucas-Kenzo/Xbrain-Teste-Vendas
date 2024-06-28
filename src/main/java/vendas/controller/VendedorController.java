@@ -1,9 +1,7 @@
 package vendas.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import vendas.model.Vendedor;
 import vendas.service.VendedorService;
@@ -18,20 +16,18 @@ public class VendedorController {
     private final VendedorService service;
 
     @GetMapping
-    public ResponseEntity<List<Vendedor>> findAll(){
-        var vendedores = service.findAll();
-        return ResponseEntity.ok(vendedores);
+    public List<Vendedor> findAll() {
+        return service.findAll();
     }
 
     @GetMapping("{id}")
-    public ResponseEntity<Vendedor> findById(@PathVariable Long id){
-        var vendedor = service.findById(id);
-        return ResponseEntity.ok(vendedor);
+    public Vendedor findById(@PathVariable Long id) {
+        return service.findById(id);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Vendedor salvar(@RequestBody Vendedor vendedor){
+    public Vendedor salvar(@RequestBody Vendedor vendedor) {
         return service.salvar(vendedor);
     }
 

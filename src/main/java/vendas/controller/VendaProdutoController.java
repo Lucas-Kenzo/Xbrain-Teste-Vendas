@@ -18,7 +18,7 @@ public class VendaProdutoController {
     private final VendaProdutoService service;
 
     @GetMapping
-    public ResponseEntity<List<VendaProduto>> findAll(){
+    public ResponseEntity<List<VendaProduto>> findAll() {
         var vendaProdutos = service.findAll();
         return ResponseEntity.ok(vendaProdutos);
     }

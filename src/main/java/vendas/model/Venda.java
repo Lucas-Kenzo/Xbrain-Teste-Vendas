@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @Builder
 @Table(name = "venda")
-//@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Venda {
 
     @Id
@@ -56,13 +56,13 @@ public class Venda {
     }
 
     public void substituiItens(List<VendaProduto> itens) {
-        if(!this.itens.isEmpty()){
+        if (!this.itens.isEmpty()) {
             this.itens.clear();
         }
         setItens(itens);
     }
 
-    public void setDataDaVenda(){
+    public void setDataDaVenda() {
         this.dataDaVenda = LocalDateTime.now(ZoneId.of("America/Sao_Paulo"));
     }
 
@@ -71,7 +71,7 @@ public class Venda {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
-    public void setItens(List<VendaProduto> itens){
+    public void setItens(List<VendaProduto> itens) {
         this.itens = new ArrayList<>(itens);
     }
 
